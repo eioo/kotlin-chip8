@@ -31,6 +31,8 @@ build/
 .idea/libraries/Maven*.xml
 .idea/artifacts/PILL_*.xml
 .idea/modules
+.idea/dictionaries
+.idea/inspectionProfiles
 .idea/runConfigurations/JPS_*.xml
 .idea/runConfigurations/PILL_*.xml
 .idea/libraries
