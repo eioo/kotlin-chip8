@@ -79,22 +79,70 @@ class Emulator {
         val lsb = memory[pc + 1]
 
         opcode = (msb.toInt() shl 8 or lsb.toPositiveInt()).and(0xffff)
-
-        print(
-            "PC: ${pc.toHex()}\t\tOP: ${opcode.toHex()}\t"
-        )
+        print(pc.toHex().padEnd(10, ' ') + opcode.toHex().padEnd(10, ' '))
 
         when (msb.high()) {
-            0x6 -> { // 6xkk - LD Vx, byte
-                val x = msb.low()
-                val kk = lsb.toPositiveInt()
+            0x2 -> {
+                // 2nnn - CALL addr
+                // Call subroutine at nnn.
+                val addr = opcode and 0xfff
 
-                V[x] = kk
+                sp++            // TODO: May be the other way around
+                stack[sp] = pc
+                pc = addr
+
+                println("CALL ${addr.toHex()}")
+            }
+            0x6 -> {
+                // 6xkk - LD Vx, byte
+                // Set Vx = kk.
+                val x = msb.low()
+                val byte = lsb.toPositiveInt()
+
+                V[x] = byte
                 pc += 2
 
-                println("LD V${x.toHex()}, ${kk.toHex()}")
+                println("LD V${x.toHex()}, ${byte.toHex()}")
+            }
+            0xa -> {
+                // Annn - LD I, addr
+                // Set I = nnn.
+                val addr = opcode and 0xfff
+
+                I = addr
+                pc += 2
+
+                println("LD I, ${addr.toHex()}")
+            }
+            0xd -> {
+                // Dxyn - DRW Vx, Vy, nibble
+                // Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision.
+                val x = msb.high()
+                val y = msb.low()
+                val height = lsb.low()
+
+                V[0xf] = 0
+
+                for (yline in 0..(height - 1)) {
+                    val pixel = memory[I + 1]
+
+                    for (xline in (0..7)) {
+                        if ((pixel.toPositiveInt() and (0x80 shr xline)) != 0) {
+                            val index = (x + xline + ((y + yline) * 64))
+                            if (gfx[index] == 1) {
+                                V[0xf] = 1
+                            }
+
+                            gfx[index] = gfx[index] xor 1
+                        }
+                    }
+                }
+
+                pc += 2
+                println("DRW V${x.toHex()}, V${y.toHex()}, ${height.toHex()}")
             }
             else -> {
+
                 println("! Unknown instruction")
                 return stop()
             }
