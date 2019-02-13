@@ -2,17 +2,17 @@ package org.eioo.chip8
 
 class Emulator {
 
-    private val memory: UIntArray = UIntArray(4096) // Memory
+    private val memory: ByteArray = ByteArray(4096) // Memory
     private val gfx: IntArray = IntArray(64 * 32)   // Graphics, 1 bit for each pixelMemory
     private val key: IntArray = IntArray(16)        // Pressed keys
-    private val V: ShortArray = ShortArray(16)      // Registers (V0, V1, ... VE) VE: Carry flag
-    private val stack: ShortArray = ShortArray(16)  // Stack
-    private var opcode: Short = 0                   // Current operation code
+    private val V: IntArray = IntArray(16)          // Registers (V0, V1, ... VE) VE: Carry flag
+    private val stack: IntArray = IntArray(16)      // Stack
+    private var opcode: Int = 0                     // Current operation code
     private var sp: Int = 0                         // Stack pointer
-    private var I: Short = 0                        // Index register
+    private var I: Int = 0                          // Index register
     private var pc: Int = 0                         // Program counter (0x000 -> 0xFFF)
-    private var delayTimer: Short = 0               // 60Hz counts to zero
-    private var soundTimer: Short = 0               // -//-
+    private var delayTimer: Int = 0                 // 60Hz counts to zero
+    private var soundTimer: Int = 0                 // -//-
 
     var running: Boolean = false                    // State of machine
     var drawFlag: Boolean = false
@@ -39,7 +39,7 @@ class Emulator {
         delayTimer = 0
         soundTimer = 0
 
-        for (i in 0..(memory.size - 1)) memory[i] = 0u
+        for (i in 0..(memory.size - 1)) memory[i] = 0
         for (i in 0..(V.size - 1)) V[i] = 0
         for (i in 0..(stack.size - 1)) stack[i] = 0
         for (i in 0..(gfx.size - 1)) gfx[i] = 0
@@ -53,7 +53,7 @@ class Emulator {
     }
 
     private fun loadFontset() {
-        for (i in 0..79) memory[i] = FONTSET[i].toUInt()
+        for (i in 0..79) memory[i] = FONTSET[i].toByte()
     }
 
     fun loadRom(romPath: String) {
@@ -68,18 +68,39 @@ class Emulator {
         val fileBytes = res.readBytes()
 
         for (i in 0..(fileBytes.size - 1)) {
-            memory[0x200 + i] = fileBytes[i].toUInt()
+            memory[0x200 + i] = fileBytes[i]
         }
 
         println("ROM loaded, byte size: ${fileBytes.size}")
     }
 
     fun emulateCycle() {
-        opcode = (memory[pc] shl 8 or memory[pc + 1]).toShort()
+        val msb = memory[pc]
+        val lsb = memory[pc + 1]
 
-        // Decode Opcode
-        // Execute Opcode
+        opcode = (msb.toInt() shl 8 or lsb.toPositiveInt()).and(0xffff)
 
-        // Update timers
+        print(
+            "PC: ${pc.toHex()}\t\tOP: ${opcode.toHex()}\t"
+        )
+
+        when (msb.high()) {
+            0x6 -> { // 6xkk - LD Vx, byte
+                val x = msb.low()
+                val kk = lsb.toPositiveInt()
+
+                V[x] = kk
+                pc += 2
+
+                println("LD V${x.toHex()}, ${kk.toHex()}")
+            }
+            else -> {
+                println("! Unknown instruction")
+                return stop()
+            }
+        }
+
+        if (this.delayTimer > 0) delayTimer--
+        if (this.soundTimer > 0) soundTimer--
     }
 }
