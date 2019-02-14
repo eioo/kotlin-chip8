@@ -1,4 +1,4 @@
-package org.eioo.chip8
+package com.eioo.chip8
 
 class Memory(private var emu: Emulator) {
     private val memory: ByteArray = ByteArray(4096)
@@ -22,8 +22,9 @@ class Memory(private var emu: Emulator) {
         0xF0, 0x80, 0xF0, 0x80, 0x80  // F
     )
 
-    fun read(addr: Int) = memory[addr];
+    fun read(addr: Int) = memory[addr]
     fun write(addr: Int, value: Byte) = memory.set(addr, value)
+    fun write(addr: Int, value: Int) = memory.set(addr, value.toByte())
 
     fun reset() {
         for (i in 0 until memory.size) memory[i] = 0

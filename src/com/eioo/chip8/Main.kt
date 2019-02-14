@@ -1,4 +1,4 @@
-package org.eioo.chip8
+package com.eioo.chip8
 
 fun main() {
     val emu = Emulator()

@@ -1,4 +1,4 @@
-package org.eioo.chip8
+package com.eioo.chip8
 
 // Tyvm! https://github.com/mvukic/chip8emulator/blob/master/src/main/kotlin/hr/mvukic/chip8emu/Extensions.kt
 
