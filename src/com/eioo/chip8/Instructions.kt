@@ -2,8 +2,8 @@ package com.eioo.chip8
 
 open class Instructions(private var cpu: CPU, private var memory: Memory) {
     fun unknown() {
-        println("! Unknown instruction")
         cpu.running = false
+        println("! Unknown instruction")
     }
 
     // region 0x0
@@ -124,6 +124,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
             }
         }
 
+        cpu.drawFlag = true
         cpu.pc += 2
         println("DRW V${reg1.toHex()}, V${reg2.toHex()}, ${height.toHex()}")
     }

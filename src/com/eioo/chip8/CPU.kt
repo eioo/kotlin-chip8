@@ -1,6 +1,11 @@
 package com.eioo.chip8
 
+import java.lang.System.currentTimeMillis
+
 class CPU(emu: Emulator) {
+    private var memory: Memory = emu.memory
+    private var ins: Instructions = Instructions(this, memory)
+
     val gfx: IntArray = IntArray(64 * 32)   // Graphics, 1 bit for each pixelMemory
     val key: IntArray = IntArray(16)        // Pressed keys
     val V: IntArray = IntArray(16)          // Registers (V0, V1, ... VE) VE: Carry flag
@@ -11,11 +16,10 @@ class CPU(emu: Emulator) {
     var pc: Int = 0                         // Program counter (0x000 -> 0xFFF)
     var delayTimer: Int = 0                 // 60Hz counts to zero
     var soundTimer: Int = 0                 // -//-
+
+    private val frequency = 60              // CPU cycles per second (60 by default)
     var drawFlag: Boolean = false
     var running: Boolean = false            // CPU running or not
-
-    private var memory: Memory = emu.memory
-    private var ins: Instructions = Instructions(this, memory)
 
     fun reset() {
         pc = 0x200
@@ -32,14 +36,25 @@ class CPU(emu: Emulator) {
     }
 
     fun mainLoop() {
+        var deltaTime: Long = 0
+        val sleepTime = 1000 / frequency
+
         while (running) {
+            deltaTime = currentTimeMillis()
             performCycle()
 
             if (drawFlag) {
-                drawFlag = false  // TODO: Implement
+                drawFlag = false // TODO: Implement
             }
 
             // TODO: Check keys here
+
+            // Throttle cycles
+            deltaTime = currentTimeMillis() - deltaTime
+
+            if (sleepTime - deltaTime > 0) {
+                Thread.sleep(sleepTime - deltaTime)
+            }
         }
     }
 
