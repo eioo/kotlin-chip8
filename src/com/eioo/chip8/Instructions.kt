@@ -134,6 +134,46 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
     // endregion
 
     // region 0xF
+    // 0x07
+    fun getdelay(reg: Int) {
+        // Fx07 - LD Vx, DT
+        // Set Vx = delay timer value.
+        cpu.V[reg] = cpu.delayTimer
+        cpu.pc += 2
+
+        println("LD V$reg, DT")
+    }
+
+    // 0x15
+    fun setdelay(reg: Int) {
+        // Fx15 - LD DT, Vx
+        // Set delay timer = Vx.
+        cpu.delayTimer = cpu.V[reg]
+        cpu.pc += 2
+
+        println("LD DT, V$reg")
+    }
+
+    // 0x18
+    fun setsound(reg: Int) {
+        // Fx18 - LD ST, Vx
+        // Set sound timer = Vx.
+        cpu.soundTimer = cpu.V[reg]
+        cpu.pc += 2
+
+        println("LD DT, V$reg")
+    }
+
+    // 0x1E
+    fun addi(reg: Int) {
+        // Fx1E - ADD I, Vx
+        // Set I = I + Vx.
+        cpu.I += cpu.V[reg]
+        cpu.pc += 2
+
+        println("ADD I, V$reg")
+    }
+
     // 0x29
     fun spritei(reg: Int) {
         // Fx29 - LD F, Vx
@@ -149,7 +189,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         // TODO: May be off
         // Fx33 - LD B, Vx
         // Store BCD representation of Vx in memory locations I, I+1, and I+2.
-        val a = (cpu.V[reg].toDouble() / 100).toInt()
+        val a = (cpu.V[reg].toDouble() / 100.0).toInt()
         val b = ((cpu.V[reg].toDouble() / 10.0).rem(10)).toInt()
         val c = (cpu.V[reg].rem(100)).rem(10)
 
@@ -162,8 +202,24 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         println("LD B, V$reg ($a, $b, $c)")
     }
 
+    // 0x55
+    fun store(reg: Int) {
+        // TODO: May be wrong
+        // Fx55 - LD [I], Vx
+        // Store registers V0 through Vx in memory starting at location I.
+        for (i in 0 until reg) {
+            memory.write(cpu.I + i) = cpu.V[i]
+        }
+
+        cpu.I += reg + 1
+        cpu.pc += 2
+
+        println("LD [I], V$reg")
+    }
+
     // 0x65
     fun read(reg: Int) {
+        // TODO: May be wrong
         // Fx65 - LD Vx, [I]
         // Read registers V0 through Vx from memory starting at location I.
         for (i in 0 until reg) {

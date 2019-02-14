@@ -81,8 +81,13 @@ class CPU(emu: Emulator) {
             0xd -> ins.draw(msb.high(), msb.low(), lsb.low())
             0xf -> {
                 when (lsb.toPositiveInt()) {
+                    0x07 -> ins.getdelay(msb.low())
+                    0x15 -> ins.setdelay(msb.low())
+                    0x18 -> ins.setsound(msb.low())
+                    0x1E -> ins.addi(msb.low())
                     0x29 -> ins.spritei(msb.low())
                     0x33 -> ins.bcd(msb.low())
+                    0x55 -> ins.store(msb.low())
                     0x65 -> ins.read(msb.low())
                     else -> ins.unknown()
                 }
