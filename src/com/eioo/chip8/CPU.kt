@@ -14,12 +14,12 @@ class CPU(emu: Emulator) {
     var sp: Int = 0                         // Stack pointer
     var I: Int = 0                          // Index register
     var pc: Int = 0                         // Program counter (0x000 -> 0xFFF)
-    var delayTimer: Int = 0                 // 60Hz counts to zero
-    var soundTimer: Int = 0                 // -//-
+    var delayTimer: Int = 0                 // Counts to zero
+    var soundTimer: Int = 0                 // Counts to zero
 
     private val frequency = 60              // CPU cycles per second (60 by default)
     var drawFlag: Boolean = false
-    var running: Boolean = false            // CPU running or not
+    var running: Boolean = false
 
     fun reset() {
         pc = 0x200
