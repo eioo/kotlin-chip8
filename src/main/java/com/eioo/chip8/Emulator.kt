@@ -1,6 +1,8 @@
 package com.eioo.chip8
 
-class Emulator {
+import com.eioo.chip8.websocket.SocketServer
+
+class Emulator(private val socketServer: SocketServer) {
     var memory: Memory = Memory(this)
     var cpu: CPU = CPU(this)
 
@@ -8,8 +10,11 @@ class Emulator {
         reset()
     }
 
-    // Just an alias
-    fun loadRom(path: String) = memory.loadRom(path)
+    fun broadcastToServer() {
+        socketServer.broadcast(cpu.gfx.joinToString(""))
+    }
+
+    fun loadRom(path: String) = memory.loadRom(path) // Just an alias
 
     private fun reset() {
         memory.reset()

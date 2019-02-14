@@ -1,0 +1,41 @@
+@import './font.scss';
+
+* {
+  font-family: 'PxPlus IBM VGA8';
+  font-size: 16px;
+}
+
+canvas {
+  border: 1px solid lightgray;
+}
+
+fieldset {
+  display: inline-block;
+  vertical-align: top;
+  border: 1px solid black;
+}
+
+.registers {
+  display: none;
+  width: 80px;
+  padding: 5px 5px;
+
+  div {
+    display: flex;
+    justify-content: center;
+  }
+
+  label {
+    margin-top: 3px;
+    margin-right: 15px;
+  }
+
+  input[type='text'] {
+    width: 25px;
+    text-align: center;
+  }
+}
+
+.information {
+  width: 250px;
+}

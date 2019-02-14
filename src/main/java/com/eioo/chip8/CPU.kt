@@ -2,7 +2,7 @@ package com.eioo.chip8
 
 import java.lang.System.currentTimeMillis
 
-class CPU(emu: Emulator) {
+class CPU(private val emu: Emulator) {
     private var memory: Memory = emu.memory
     private var ins: Instructions = Instructions(this, memory)
 
@@ -17,7 +17,7 @@ class CPU(emu: Emulator) {
     var delayTimer: Int = 0                 // Counts to zero
     var soundTimer: Int = 0                 // Counts to zero
 
-    private val frequency = 60              // CPU cycles per second (60 by default)
+    private val frequency = 5               // CPU cycles per second (60 by default)
     var drawFlag: Boolean = false
     var running: Boolean = false
 
@@ -44,6 +44,7 @@ class CPU(emu: Emulator) {
             performCycle()
 
             if (drawFlag) {
+                emu.broadcastToServer()
                 drawFlag = false // TODO: Implement
             }
 
@@ -63,7 +64,7 @@ class CPU(emu: Emulator) {
         val lsb = memory.read(pc + 1)
         opcode = (msb.toInt() shl 8 or lsb.toPositiveInt()).and(0xffff)
 
-        print(pc.toHex().padEnd(10, ' ') + opcode.toHex().padStart(4, '0').padEnd(10, ' '))
+        debug(pc.toHex().padEnd(10, ' ') + opcode.toHex().padStart(4, '0').padEnd(10, ' '))
 
         when (msb.high()) {
             0x0 -> {

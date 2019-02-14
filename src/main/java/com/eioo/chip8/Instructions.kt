@@ -3,7 +3,7 @@ package com.eioo.chip8
 open class Instructions(private var cpu: CPU, private var memory: Memory) {
     fun unknown() {
         cpu.running = false
-        println("! Unknown instruction")
+        debugln("! Unknown instruction")
     }
 
     // region 0x0
@@ -13,7 +13,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         cpu.pc = cpu.stack[cpu.sp]
         cpu.sp--
 
-        println("RET (sp: ${cpu.sp})")
+        debugln("RET (sp: ${cpu.sp})")
     }
     // endregion
 
@@ -23,7 +23,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         // Jump to location nnn.
         cpu.pc = addr
 
-        println("JP $addr")
+        debugln("JP $addr")
     }
 
     // endregion
@@ -38,7 +38,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
 
         cpu.pc = addr
 
-        println("CALL ${addr.toHex()} (sp: ${cpu.sp})")
+        debugln("CALL ${addr.toHex()} (sp: ${cpu.sp})")
     }
     // endregion
 
@@ -58,7 +58,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         cpu.V[reg] = value
         cpu.pc += 2
 
-        println("LD V${reg.toHex()}, ${value.toHex()}")
+        debugln("LD V${reg.toHex()}, ${value.toHex()}")
     }
     // endregion
 
@@ -69,7 +69,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         cpu.V[reg] += value
         cpu.pc += 2
 
-        println("ADD V$reg, $value")
+        debugln("ADD V$reg, $value")
     }
     // endregion
 
@@ -86,7 +86,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         cpu.I = value
         cpu.pc += 2
 
-        println("LD I, ${value.toHex()}")
+        debugln("LD I, ${value.toHex()}")
     }
     // endregion
 
@@ -96,7 +96,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         // Jump to location nnn + V0.
         cpu.pc = addr + cpu.V[0]
 
-        println("JP V0, $addr")
+        debugln("JP V0, $addr")
     }
     // endregion
 
@@ -126,7 +126,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
 
         cpu.drawFlag = true
         cpu.pc += 2
-        println("DRW V${reg1.toHex()}, V${reg2.toHex()}, ${height.toHex()}")
+        debugln("DRW V${reg1.toHex()}, V${reg2.toHex()}, ${height.toHex()}")
     }
     // endregion
 
@@ -141,7 +141,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         cpu.V[reg] = cpu.delayTimer
         cpu.pc += 2
 
-        println("LD V$reg, DT")
+        debugln("LD V$reg, DT")
     }
 
     // 0x15
@@ -151,7 +151,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         cpu.delayTimer = cpu.V[reg]
         cpu.pc += 2
 
-        println("LD DT, V$reg")
+        debugln("LD DT, V$reg")
     }
 
     // 0x18
@@ -161,7 +161,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         cpu.soundTimer = cpu.V[reg]
         cpu.pc += 2
 
-        println("LD DT, V$reg")
+        debugln("LD DT, V$reg")
     }
 
     // 0x1E
@@ -171,7 +171,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         cpu.I += cpu.V[reg]
         cpu.pc += 2
 
-        println("ADD I, V$reg")
+        debugln("ADD I, V$reg")
     }
 
     // 0x29
@@ -181,7 +181,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         cpu.I = cpu.V[reg] * 5
         cpu.pc += 2
 
-        println("LD F, V$reg")
+        debugln("LD F, V$reg")
     }
 
     // 0x33
@@ -199,7 +199,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
 
         cpu.pc += 2
 
-        println("LD B, V$reg ($a, $b, $c)")
+        debugln("LD B, V$reg ($a, $b, $c)")
     }
 
     // 0x55
@@ -214,7 +214,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         cpu.I += reg + 1
         cpu.pc += 2
 
-        println("LD [I], V$reg")
+        debugln("LD [I], V$reg")
     }
 
     // 0x65
@@ -229,7 +229,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         cpu.I += reg + 1
         cpu.pc += 2
 
-        println("LD V$reg [I]")
+        debugln("LD V$reg [I]")
     }
     //endregion
 }
