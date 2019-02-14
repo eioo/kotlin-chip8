@@ -83,6 +83,7 @@ class CPU(emu: Emulator) {
                 when (lsb.toPositiveInt()) {
                     0x07 -> ins.getdelay(msb.low())
                     0x15 -> ins.setdelay(msb.low())
+                    // 0x0a -> ins.waitkey(msb.low())
                     0x18 -> ins.setsound(msb.low())
                     0x1E -> ins.addi(msb.low())
                     0x29 -> ins.spritei(msb.low())

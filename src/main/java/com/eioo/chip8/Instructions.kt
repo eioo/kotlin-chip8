@@ -208,7 +208,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         // Fx55 - LD [I], Vx
         // Store registers V0 through Vx in memory starting at location I.
         for (i in 0 until reg) {
-            memory.write(cpu.I + i) = cpu.V[i]
+            memory.write(cpu.I + i, cpu.V[i])
         }
 
         cpu.I += reg + 1
