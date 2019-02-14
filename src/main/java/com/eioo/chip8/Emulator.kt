@@ -10,7 +10,7 @@ class Emulator(private val socketServer: SocketServer) {
         reset()
     }
 
-    fun broadcastToServer() {
+    fun broadcastGraphics() {
         socketServer.broadcast(cpu.gfx.joinToString(""))
     }
 

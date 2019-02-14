@@ -17,7 +17,7 @@ class CPU(private val emu: Emulator) {
     var delayTimer: Int = 0                 // Counts to zero
     var soundTimer: Int = 0                 // Counts to zero
 
-    private val frequency = 5               // CPU cycles per second (60 by default)
+    private val frequency = 200             // CPU cycles per second (60 by default)
     var drawFlag: Boolean = false
     var running: Boolean = false
 
@@ -36,7 +36,7 @@ class CPU(private val emu: Emulator) {
     }
 
     fun mainLoop() {
-        var deltaTime: Long = 0
+        var deltaTime: Long
         val sleepTime = 1000 / frequency
 
         while (running) {
@@ -44,8 +44,8 @@ class CPU(private val emu: Emulator) {
             performCycle()
 
             if (drawFlag) {
-                emu.broadcastToServer()
-                drawFlag = false // TODO: Implement
+                emu.broadcastGraphics()
+                drawFlag = false
             }
 
             // TODO: Check keys here
@@ -62,29 +62,54 @@ class CPU(private val emu: Emulator) {
     private fun performCycle() {
         val msb = memory.read(pc)
         val lsb = memory.read(pc + 1)
-        opcode = (msb.toInt() shl 8 or lsb.toPositiveInt()).and(0xffff)
+        opcode = (msb.toInt() shl 8 or lsb.toPositiveInt()).and(0xFFFF)
 
         debug(pc.toHex().padEnd(10, ' ') + opcode.toHex().padStart(4, '0').padEnd(10, ' '))
 
         when (msb.high()) {
             0x0 -> {
                 when (lsb.toPositiveInt()) {
-                    0xee -> ins.ret()
+                    0xEE -> ins.ret()
                     else -> ins.unknown()
                 }
             }
-            0x1 -> ins.setpc(opcode and 0xfff)
-            0x2 -> ins.call(opcode and 0xfff)
+            0x1 -> ins.setpc(opcode and 0xFFF)
+            0x2 -> ins.call(opcode and 0xFFF)
+            0x3 -> ins.skip(msb.low(), lsb.toPositiveInt())
+            0x4 -> ins.skipne(msb.low(), lsb.toPositiveInt())
+            0x5 -> ins.skipv(msb.low(), lsb.toPositiveInt())
             0x6 -> ins.set(msb.low(), lsb.toPositiveInt())
-            0x7 -> ins.add(msb.low(), lsb.toPositiveInt())
-            0xa -> ins.seti(opcode and 0xfff)
-            0xb -> ins.jmp(opcode and 0xfff)
-            0xd -> ins.draw(msb.high(), msb.low(), lsb.low())
-            0xf -> {
+            0x7 -> ins.addv(msb.low(), lsb.toPositiveInt())
+            0x8 -> {
+                when (lsb.low()) {
+                    0x0 -> ins.setv(msb.low(), lsb.high())
+                    0x1 -> ins.or(msb.low(), lsb.high())
+                    0x2 -> ins.and(msb.low(), lsb.high())
+                    0x3 -> ins.xor(msb.low(), lsb.high())
+                    0x4 -> ins.add(msb.low(), lsb.high())
+                    0x5 -> ins.sub(msb.low(), lsb.high())
+                    0x6 -> ins.shr(msb.low(), lsb.high())
+                    0x7 -> ins.subn(msb.low(), lsb.high())
+                    0xE -> ins.shl(msb.low(), lsb.high())
+                    else -> ins.unknown()
+                }
+            }
+            0xA -> ins.seti(opcode and 0xFFF)
+            0xB -> ins.jmp(opcode and 0xFFF)
+            0xC -> ins.rand(msb.low(), lsb.toPositiveInt())
+            0xD -> ins.draw(msb.low(), lsb.high(), lsb.low())
+            0xE -> {
+                when (lsb.toPositiveInt()) {
+                    0x9E -> ins.skipp(msb.low())
+                    0xA1 -> ins.skipnp(msb.low())
+                    else -> ins.unknown()
+                }
+            }
+            0xF -> {
                 when (lsb.toPositiveInt()) {
                     0x07 -> ins.getdelay(msb.low())
                     0x15 -> ins.setdelay(msb.low())
-                    // 0x0a -> ins.waitkey(msb.low())
+                    // 0x0A -> ins.waitkey(msb.low())
                     0x18 -> ins.setsound(msb.low())
                     0x1E -> ins.addi(msb.low())
                     0x29 -> ins.spritei(msb.low())

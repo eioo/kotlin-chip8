@@ -17,11 +17,11 @@ export class Graphics {
     this.ctx.fillStyle = 'lightgray';
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-    const arr = Array.from(data);
+    const display = Array.from(data);
 
-    arr.forEach((char, i) => {
-      const y = i % 32;
-      const x = Math.floor(i / 32);
+    display.forEach((char, i) => {
+      const x = i % 64;
+      const y = Math.floor(i / 64);
 
       this.ctx.fillStyle = char === '0' ? '#000' : '#fff';
       this.ctx.fillRect(x * this.scale, y * this.scale, this.scale, this.scale);
