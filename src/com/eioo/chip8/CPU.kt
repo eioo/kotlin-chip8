@@ -48,16 +48,24 @@ class CPU(emu: Emulator) {
         val lsb = memory.read(pc + 1)
         opcode = (msb.toInt() shl 8 or lsb.toPositiveInt()).and(0xffff)
 
-        print(pc.toHex().padEnd(10, ' ') + opcode.toHex().padEnd(10, ' '))
+        print(pc.toHex().padEnd(10, ' ') + opcode.toHex().padStart(4, '0').padEnd(10, ' '))
 
         when (msb.high()) {
+            0x0 -> {
+                when (lsb.toPositiveInt()) {
+                    0xee -> ins.ret()
+                    else -> ins.unknown()
+                }
+            }
+            0x1 -> ins.setpc(opcode and 0xfff)
             0x2 -> ins.call(opcode and 0xfff)
-            0x6 -> ins.set(msb.low(), opcode and 0xfff)
+            0x6 -> ins.set(msb.low(), lsb.toPositiveInt())
+            0x7 -> ins.add(msb.low(), lsb.toPositiveInt())
             0xa -> ins.seti(opcode and 0xfff)
             0xb -> ins.jmp(opcode and 0xfff)
             0xd -> ins.draw(msb.high(), msb.low(), lsb.low())
             0xf -> {
-                when (lsb.toInt()) {
+                when (lsb.toPositiveInt()) {
                     0x29 -> ins.spritei(msb.low())
                     0x33 -> ins.bcd(msb.low())
                     0x65 -> ins.read(msb.low())

@@ -7,9 +7,25 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
     }
 
     // region 0x0
+    fun ret() {
+        // 0x00EE - RET
+        // Return from a subroutine.
+        cpu.pc = cpu.stack[cpu.sp]
+        cpu.sp--
+
+        println("RET (sp: ${cpu.sp})")
+    }
     // endregion
 
     // region 0x1
+    fun setpc(addr: Int) {
+        // 1nnn - JP addr
+        // Jump to location nnn.
+        cpu.pc = addr
+
+        println("JP $addr")
+    }
+
     // endregion
 
     // region 0x2
@@ -17,13 +33,12 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         // 2nnn - CALL addr
         // Call subroutine at nnn.
 
-        // TODO: May be the other way around
         cpu.sp++
         cpu.stack[cpu.sp] = cpu.pc
 
         cpu.pc = addr
 
-        println("CALL ${addr.toHex()}")
+        println("CALL ${addr.toHex()} (sp: ${cpu.sp})")
     }
     // endregion
 
@@ -48,6 +63,14 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
     // endregion
 
     // region 0x7
+    fun add(reg: Int, value: Int) {
+        // 7xkk - ADD Vx, byte
+        // Set Vx = Vx + kk
+        cpu.V[reg] += value
+        cpu.pc += 2
+
+        println("ADD V$reg, $value")
+    }
     // endregion
 
     // region 0x8
