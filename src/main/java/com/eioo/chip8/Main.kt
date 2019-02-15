@@ -12,11 +12,11 @@ fun main(args: Array<String>) {
     val server = SocketServer(8080)
     server.start()
 
-    while (!server.running) {
+    while (!server.running && server.connections.isEmpty()) {
         Thread.sleep(10)
     }
 
     val emu = Emulator(server)
-    emu.loadRom("roms/pong.rom")
+    emu.loadRom("roms/LOGO")
     emu.start()
 }

@@ -7,6 +7,25 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
     }
 
     // region 0x0
+    fun sys(addr: Int) {
+        // 0nnn - SYS addr
+        // Jump to a machine code routine at nnn.
+
+        // Do nothing here
+        cpu.pc += 2
+
+        debugln("SYS")
+    }
+
+    fun cls() {
+        // 0x00E0 - CLS
+        // Clear the display.
+        cpu.clearGraphics()
+        cpu.pc += 2
+
+        debugln("CLS")
+    }
+
     fun ret() {
         // 0x00EE - RET
         // Return from a subroutine.
@@ -24,7 +43,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         // Jump to location nnn.
         cpu.pc = addr
 
-        debugln("JP $addr")
+        debugln("JP ${addr.toHex()}")
     }
 
     // endregion
@@ -48,7 +67,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         // Skip next instruction if Vx = kk.
         cpu.pc += if (cpu.V[reg] == value) 4 else 2
 
-        debugln("SE V$reg, $value")
+        debugln("SE V${reg.toHex()}, ${value.toHex()}")
     }
     // endregion
 
@@ -58,7 +77,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         // Skip next instruction if Vx != kk.
         cpu.pc += if (cpu.V[reg] != value) 4 else 2
 
-        debugln("SNE V$reg, $value")
+        debugln("SNE V${reg.toHex()}, ${value.toHex()}")
     }
     // endregion
 
@@ -68,7 +87,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         // Skip next instruction if Vx = Vy.
         cpu.pc += if (cpu.V[reg1] == cpu.V[reg2]) 4 else 2
 
-        debugln("SE V$reg1, V$reg2")
+        debugln("SE V${reg1.toHex()}, V${reg2.toHex()}")
     }
     // endregion
 
@@ -90,7 +109,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         cpu.V[reg] += value
         cpu.pc += 2
 
-        debugln("ADD V$reg, ${value.toHex()}")
+        debugln("ADD V${reg.toHex()}, ${value.toHex()}")
     }
     // endregion
 
@@ -101,7 +120,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         cpu.V[reg1] = cpu.V[reg2]
         cpu.pc += 2
 
-        debugln("Set V$reg1 = V$reg2")
+        debugln("Set V${reg1.toHex()} = V${reg2.toHex()}")
     }
 
     fun or(reg1: Int, reg2: Int) {
@@ -110,7 +129,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         cpu.V[reg1] = cpu.V[reg1] and cpu.V[reg2]
         cpu.pc += 2
 
-        debugln("Set V$reg1 = V$reg1 OR V$reg2")
+        debugln("Set V${reg1.toHex()} = V${reg1.toHex()} OR V${reg2.toHex()}")
     }
 
     fun and(reg1: Int, reg2: Int) {
@@ -119,7 +138,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         cpu.V[reg1] = cpu.V[reg1] and cpu.V[reg2]
         cpu.pc += 2
 
-        debugln("Set V$reg1 = V$reg1 AND V$reg2")
+        debugln("Set V${reg1.toHex()} = V${reg1.toHex()} AND V${reg2.toHex()}")
     }
 
     fun xor(reg1: Int, reg2: Int) {
@@ -128,7 +147,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         cpu.V[reg1] = cpu.V[reg1] and cpu.V[reg2]
         cpu.pc += 2
 
-        debugln("Set V$reg1 = V$reg1 XOR V$reg2")
+        debugln("Set V${reg1.toHex()} = V${reg1.toHex()} XOR V${reg2.toHex()}")
     }
 
     fun add(reg1: Int, reg2: Int) {
@@ -138,7 +157,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         cpu.V[reg1] += cpu.V[reg2] and 0xFF // TODO: Not sure if correct
         cpu.pc += 2
 
-        debugln("ADD V$reg1, V$reg2 (VF: ${cpu.V[0xF]})")
+        debugln("ADD V${reg1.toHex()}, V${reg2.toHex()} (VF: ${cpu.V[0xF].toHex()})")
     }
 
     fun sub(reg1: Int, reg2: Int) {
@@ -148,7 +167,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         cpu.V[reg1] = (cpu.V[reg1] - cpu.V[reg2]) and 0xFF // TODO: Not sure if correct
         cpu.pc += 2
 
-        debugln("SUB V$reg1, V$reg2 (VF: ${cpu.V[0xF]})")
+        debugln("SUB V${reg1.toHex()}, V${reg2.toHex()} (VF: ${cpu.V[0xF].toHex()})")
     }
 
     fun shr(reg1: Int, reg2: Int) {
@@ -158,7 +177,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         cpu.V[reg1] = cpu.V[reg1] shr 1
         cpu.pc += 2
 
-        debugln("SHR V$reg1 {, V$reg2}")
+        debugln("SHR V${reg1.toHex()} {, V${reg2.toHex()}}")
     }
 
     fun subn(reg1: Int, reg2: Int) {
@@ -168,7 +187,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         cpu.V[reg1] = (cpu.V[reg2] - cpu.V[reg1]) and 0xFF // TODO: Not sure if correct
         cpu.pc += 2
 
-        debugln("SUBN V$reg1, V$reg2 (VF: ${cpu.V[0xF]})")
+        debugln("SUBN V${reg1.toHex()}, V${reg2.toHex()} (VF: ${cpu.V[0xF].toHex()})")
     }
 
 
@@ -179,7 +198,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         cpu.V[reg1] = cpu.V[reg1] shr 1
         cpu.pc += 2
 
-        debugln("SHL V$reg1 {, V$reg2}")
+        debugln("SHL V${reg1.toHex()} {, V${reg2.toHex()}}")
     }
 
     // endregion
@@ -204,7 +223,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         // Jump to location nnn + V0.
         cpu.pc = addr + cpu.V[0]
 
-        debugln("JP V0, $addr")
+        debugln("JP V0, ${addr.toHex()}")
     }
     // endregion
 
@@ -214,21 +233,23 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         // Set Vx = random byte AND kk.
         cpu.V[reg] = (0..255).random() and value
         cpu.pc += 2
-        debugln("RND V$reg, $value")
+        debugln("RND V${reg.toHex()}, ${value.toHex()}")
     }
     // endregion
 
     // region 0xD
-    fun draw(x: Int, y: Int, height: Int) {
+    fun draw(reg1: Int, reg2: Int, height: Int) {
         // Dxyn - DRW Vx, Vy, nibble
         // Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision.
+
+        val x = cpu.V[reg1].and(0xff)
+        val y = cpu.V[reg2].and(0xff)
         cpu.V[0xF] = 0
 
         for (yy in 0 until height) {
             val pixel = memory.read(cpu.I + yy).toPositiveInt()
 
             for (xx in 0 until 8) {
-
                 if ((pixel and (0x80 shr xx)) != 0) {
                     val index = (x + xx + ((y + yy) * 64))
 
@@ -244,7 +265,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         cpu.drawFlag = true
         cpu.pc += 2
 
-        debugln("DRW V${x.toHex()}, V${y.toHex()}, ${height.toHex()}")
+        debugln("DRW V${reg1.toHex()}, V${reg2.toHex()}, $height (x: $x, y: $y)")
     }
     // endregion
 
@@ -254,7 +275,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         // Skip next instruction if key with the value of Vx pressed.
         cpu.pc += if (cpu.key[cpu.V[reg]] == 1) 4 else 2
 
-        debugln("SKP V$reg")
+        debugln("SKP V${reg.toHex()}")
     }
 
     fun skipnp(reg: Int) {
@@ -262,7 +283,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         // Skip next instruction if key with the value of Vx is not pressed.
         cpu.pc += if (cpu.key[cpu.V[reg]] == 0) 4 else 2
 
-        debugln("SKNP V$reg")
+        debugln("SKNP V${reg.toHex()}")
     }
     // endregion
 
@@ -274,7 +295,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         cpu.V[reg] = cpu.delayTimer
         cpu.pc += 2
 
-        debugln("LD V$reg, DT")
+        debugln("LD V${reg.toHex()}, DT")
     }
 
     // 0x15
@@ -284,7 +305,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         cpu.delayTimer = cpu.V[reg]
         cpu.pc += 2
 
-        debugln("LD DT, V$reg")
+        debugln("LD DT, V${reg.toHex()}")
     }
 
     // 0x18
@@ -294,7 +315,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         cpu.soundTimer = cpu.V[reg]
         cpu.pc += 2
 
-        debugln("LD DT, V$reg")
+        debugln("LD DT, V${reg.toHex()}")
     }
 
     // 0x1E
@@ -304,7 +325,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         cpu.I += cpu.V[reg]
         cpu.pc += 2
 
-        debugln("ADD I, V$reg")
+        debugln("ADD I, V${reg.toHex()}")
     }
 
     // 0x29
@@ -314,7 +335,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         cpu.I = cpu.V[reg] * 5
         cpu.pc += 2
 
-        debugln("LD F, V$reg")
+        debugln("LD F, V${reg.toHex()}")
     }
 
     // 0x33
@@ -332,7 +353,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
 
         cpu.pc += 2
 
-        debugln("LD B, V$reg ($a, $b, $c)")
+        debugln("LD B, V${reg.toHex()} (${a.toHex()}, ${b.toHex()}, ${c.toHex()})")
     }
 
     // 0x55
@@ -347,7 +368,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         cpu.I += reg + 1
         cpu.pc += 2
 
-        debugln("LD [I], V$reg")
+        debugln("LD [I], V${reg.toHex()}")
     }
 
     // 0x65
@@ -362,7 +383,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         cpu.I += reg + 1
         cpu.pc += 2
 
-        debugln("LD V$reg [I]")
+        debugln("LD V${reg.toHex()} [I]")
     }
     //endregion
 }

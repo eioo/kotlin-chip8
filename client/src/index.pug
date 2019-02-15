@@ -1,4 +1,10 @@
 doctype html
+
+mixin variable(label, id)
+  .variable
+    label #{label}
+    input(type='text', id=id, value="0", disabled='')
+
 html(lang='en')
   head
     meta(charset='UTF-8')
@@ -7,23 +13,37 @@ html(lang='en')
     title CHIP-8 Emulator
     link(rel='stylesheet', href='scss/main.scss')
   body
-    fieldset
-      legend Game canvas
-      canvas
-    
-    fieldset.registers
-      legend Registers
+    .grid
+      fieldset.display
+        legend Game canvas
+        canvas
+      
+      fieldset.info
+        legend Information
+        div Socket status:&nbsp;
+          span#socket-status -
 
-      - for (let i = 0; i < 16; i++) {
-      -   const hex = i.toString(16).toUpperCase();
-      div
-        label V#{hex}
-        input(type='text', value="0", disabled='')
-      - }
+      fieldset.variables
+        legend Variables
 
-    fieldset.information
-      legend Information
-      div Socket status:&nbsp;
-        span#socket-status -
+        .variable-grid
+          .registers
+            - for (let i = 0; i < 16; i++) {
+            -   const hex = i.toString(16).toUpperCase();
+            +variable("V" + hex, "v" + i)
+            - }
+          
+          .stack
+            - for (let i = 0; i < 16; i++) {
+            -   const hex = i.toString(16).toUpperCase();
+            +variable("S" + hex, "s" + i)
+            - }
 
-    script(src='app.ts')
+          .other
+            +variable("PC", "pc")
+            +variable("I", "i")
+            +variable("SP", "sp")
+            +variable("DT", "dt")
+            +variable("ST", "st")
+
+      script(src='app.ts')

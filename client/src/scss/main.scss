@@ -5,25 +5,25 @@
   font-size: 16px;
 }
 
-canvas {
-  border: 1px solid lightgray;
-}
-
 fieldset {
   display: inline-block;
   vertical-align: top;
   border: 1px solid black;
 }
 
-.registers {
-  display: none;
-  width: 80px;
-  padding: 5px 5px;
+.grid {
+  height: 350px;
+  width: 600px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  grid-template-areas: 'display info' 'variables variables';
+}
 
-  div {
-    display: flex;
-    justify-content: center;
-  }
+.variable {
+  display: flex;
+  justify-content: space-between;
+  width: 60px;
 
   label {
     margin-top: 3px;
@@ -36,6 +36,38 @@ fieldset {
   }
 }
 
-.information {
-  width: 250px;
+.display {
+  grid-area: display;
+
+  canvas {
+    border: 1px solid lightgray;
+  }
+}
+
+.info {
+  grid-area: info;
+}
+
+.variables {
+  grid-area: variables;
+
+  .variable-grid {
+    width: 280px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    grid-template-areas: 'registers stack other' 'registers stack other';
+  }
+
+  .registers {
+    grid-area: registers;
+  }
+
+  .stack {
+    grid-area: stack;
+  }
+
+  .other {
+    grid-area: other;
+  }
 }

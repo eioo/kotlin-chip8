@@ -17,7 +17,7 @@ class CPU(private val emu: Emulator) {
     var delayTimer: Int = 0                 // Counts to zero
     var soundTimer: Int = 0                 // Counts to zero
 
-    private val frequency = 200             // CPU cycles per second (60 by default)
+    private val frequency = 60              // CPU cycles per second (60 by default)
     var drawFlag: Boolean = false
     var running: Boolean = false
 
@@ -31,8 +31,12 @@ class CPU(private val emu: Emulator) {
 
         for (i in 0 until V.size) V[i] = 0
         for (i in 0 until stack.size) stack[i] = 0
-        for (i in 0 until gfx.size) gfx[i] = 0
         for (i in 0 until key.size) key[i] = 0
+        clearGraphics()
+    }
+
+    fun clearGraphics() {
+        for (i in 0 until gfx.size) gfx[i] = 0
     }
 
     fun mainLoop() {
@@ -59,16 +63,50 @@ class CPU(private val emu: Emulator) {
         }
     }
 
+    fun debugLoop() {
+        while (running) {
+            print("\n${pc.toHex()} > ")
+            val input = readLine()!!
+
+            when (input) {
+                "n" -> {
+                    performCycle()
+                    emu.broadcastVariables()
+
+                    if (drawFlag) {
+                        emu.broadcastGraphics()
+                        drawFlag = false
+                    }
+                }
+                "i" -> {
+                    println(I.toHex())
+                }
+                "v" -> {
+                    V.forEachIndexed { i, value ->
+                        println("V$i: ${value.toHex()}")
+                    }
+                }
+                "s" -> {
+                    stack.forEachIndexed { i, value ->
+                        println("S$i: ${value.toHex()}")
+                    }
+                }
+            }
+        }
+    }
+
     private fun performCycle() {
         val msb = memory.read(pc)
         val lsb = memory.read(pc + 1)
         opcode = (msb.toInt() shl 8 or lsb.toPositiveInt()).and(0xFFFF)
 
-        debug(pc.toHex().padEnd(10, ' ') + opcode.toHex().padStart(4, '0').padEnd(10, ' '))
+        debug("0x" + pc.toHex().padEnd(10, ' ') + opcode.toHex().padStart(4, '0').padEnd(10, ' '))
 
         when (msb.high()) {
             0x0 -> {
                 when (lsb.toPositiveInt()) {
+                    0x00 -> ins.sys(opcode and 0xFFF)
+                    0xE0 -> ins.cls()
                     0xEE -> ins.ret()
                     else -> ins.unknown()
                 }

@@ -1,5 +1,3 @@
-import { App } from './app';
-
 export class Graphics {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;

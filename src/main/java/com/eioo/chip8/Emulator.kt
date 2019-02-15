@@ -14,6 +14,21 @@ class Emulator(private val socketServer: SocketServer) {
         socketServer.broadcast(cpu.gfx.joinToString(""))
     }
 
+    fun broadcastVariables() {
+        // TODO: Add better serialization
+        var data = ""
+
+        data += "${cpu.pc};"
+        data += "${cpu.I};"
+        data += "${cpu.sp};"
+        data += "${cpu.delayTimer};"
+        data += "${cpu.soundTimer};"
+        data += "${cpu.stack.joinToString(",")};"
+        data += "${cpu.V.joinToString(",")};"
+
+        socketServer.broadcast(data)
+    }
+
     fun loadRom(path: String) = memory.loadRom(path) // Just an alias
 
     private fun reset() {
@@ -25,7 +40,11 @@ class Emulator(private val socketServer: SocketServer) {
         cpu.running = true
 
         val mainThread = Thread(Runnable {
-            cpu.mainLoop()
+            if (debugMode) {
+                cpu.debugLoop()
+            } else {
+                cpu.mainLoop()
+            }
         })
 
         mainThread.start()
