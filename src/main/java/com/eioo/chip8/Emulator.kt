@@ -2,36 +2,60 @@ package com.eioo.chip8
 
 import com.eioo.chip8.websocket.SocketServer
 
-class Emulator(private val socketServer: SocketServer) {
+class Emulator {
     var memory: Memory = Memory(this)
     var cpu: CPU = CPU(this)
+    var socketServer: SocketServer? = null
+
+    var currentRom = ""
 
     init {
         reset()
     }
 
     fun broadcastGraphics() {
-        socketServer.broadcast(cpu.gfx.joinToString(""))
+        if (socketServer == null) {
+            println("No socket server")
+            return
+        }
+
+        socketServer!!.broadcast(cpu.gfx.joinToString(""))
     }
 
     fun broadcastVariables() {
-        // TODO: Add better serialization
-        var data = ""
+        if (socketServer == null) {
+            println("No socket server")
+            return
+        }
 
-        data += "${cpu.pc};"
-        data += "${cpu.I};"
-        data += "${cpu.sp};"
-        data += "${cpu.delayTimer};"
-        data += "${cpu.soundTimer};"
-        data += "${cpu.stack.joinToString(",")};"
-        data += "${cpu.V.joinToString(",")};"
+        val data = """
+            {
+                "pc": ${cpu.pc},
+                "i": ${cpu.I},
+                "sp": ${cpu.sp},
+                "dt": ${cpu.delayTimer},
+                "st": ${cpu.soundTimer},
+                "stack": [${cpu.stack.joinToString(",")}],
+                "v": [${cpu.V.joinToString(",")}]
+            }
+        """.trimIndent()
 
-        socketServer.broadcast(data)
+        socketServer!!.broadcast(data)
     }
 
-    fun loadRom(path: String) = memory.loadRom(path) // Just an alias
+    fun broadcastRoms() {
+        val roms = ResourceUtils().getResourceFiles("roms")
+        val romString = "[\"${roms.joinToString("\",\"")}\"]"
 
-    private fun reset() {
+        socketServer!!.broadcast("{ \"roms\": $romString }")
+    }
+
+    fun loadRom(path: String) {
+        currentRom = path
+        memory.loadRom(path)
+    }
+
+    fun reset() {
         memory.reset()
         cpu.reset()
     }
@@ -40,11 +64,7 @@ class Emulator(private val socketServer: SocketServer) {
         cpu.running = true
 
         val mainThread = Thread(Runnable {
-            if (debugMode) {
-                cpu.debugLoop()
-            } else {
-                cpu.mainLoop()
-            }
+            cpu.mainLoop()
         })
 
         mainThread.start()

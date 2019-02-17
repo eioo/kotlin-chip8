@@ -20,8 +20,24 @@ html(lang='en')
       
       fieldset.info
         legend Information
-        div Socket status:&nbsp;
-          span#socket-status -
+        
+        .grid
+          div Socket status:&nbsp;
+          div#socket-status -
+
+          div Emulator status:&nbsp;
+          div#emulator-status -
+
+          div Select rom: 
+          div
+            select#rom-list
+              option(value="", disabled, selected)
+        
+        div.emulator-controls
+          button#start Start
+          button#stop Stop
+          button#step Step
+          button#reset Reset
 
       fieldset.variables
         legend Variables

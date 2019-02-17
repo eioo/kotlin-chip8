@@ -46,6 +46,7 @@ class CPU(private val emu: Emulator) {
         while (running) {
             deltaTime = currentTimeMillis()
             performCycle()
+            emu.broadcastVariables()
 
             if (drawFlag) {
                 emu.broadcastGraphics()
@@ -63,38 +64,6 @@ class CPU(private val emu: Emulator) {
         }
     }
 
-    fun debugLoop() {
-        while (running) {
-            print("\n${pc.toHex()} > ")
-            val input = readLine()!!
-
-            when (input) {
-                "n" -> {
-                    performCycle()
-                    emu.broadcastVariables()
-
-                    if (drawFlag) {
-                        emu.broadcastGraphics()
-                        drawFlag = false
-                    }
-                }
-                "i" -> {
-                    println(I.toHex())
-                }
-                "v" -> {
-                    V.forEachIndexed { i, value ->
-                        println("V$i: ${value.toHex()}")
-                    }
-                }
-                "s" -> {
-                    stack.forEachIndexed { i, value ->
-                        println("S$i: ${value.toHex()}")
-                    }
-                }
-            }
-        }
-    }
-
     private fun performCycle() {
         val msb = memory.read(pc)
         val lsb = memory.read(pc + 1)
@@ -105,7 +74,7 @@ class CPU(private val emu: Emulator) {
         when (msb.high()) {
             0x0 -> {
                 when (lsb.toPositiveInt()) {
-                    0x00 -> ins.sys(opcode and 0xFFF)
+                    0x00 -> ins.sys()
                     0xE0 -> ins.cls()
                     0xEE -> ins.ret()
                     else -> ins.unknown()
@@ -115,7 +84,7 @@ class CPU(private val emu: Emulator) {
             0x2 -> ins.call(opcode and 0xFFF)
             0x3 -> ins.skip(msb.low(), lsb.toPositiveInt())
             0x4 -> ins.skipne(msb.low(), lsb.toPositiveInt())
-            0x5 -> ins.skipv(msb.low(), lsb.toPositiveInt())
+            0x5 -> ins.skipv(msb.low(), lsb.high())
             0x6 -> ins.set(msb.low(), lsb.toPositiveInt())
             0x7 -> ins.addv(msb.low(), lsb.toPositiveInt())
             0x8 -> {

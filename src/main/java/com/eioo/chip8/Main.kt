@@ -9,14 +9,9 @@ fun main(args: Array<String>) {
         debugMode = true
     }
 
-    val server = SocketServer(8080)
+    val emu = Emulator()
+    val server = SocketServer(emu, 8080)
+    emu.socketServer = server
+
     server.start()
-
-    while (!server.running && server.connections.isEmpty()) {
-        Thread.sleep(10)
-    }
-
-    val emu = Emulator(server)
-    emu.loadRom("roms/LOGO")
-    emu.start()
 }

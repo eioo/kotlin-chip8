@@ -1,6 +1,7 @@
 package com.eioo.chip8
 
 class Memory(private var emu: Emulator) {
+    private val resUtils: ResourceUtils = ResourceUtils()
     private val memory: ByteArray = ByteArray(4096)
 
     private val fontset = intArrayOf(
@@ -37,7 +38,7 @@ class Memory(private var emu: Emulator) {
 
     fun loadRom(romPath: String) {
         println("Loading ROM from path: \"$romPath\"")
-        val res = this::class.java.classLoader.getResource(romPath)
+        val res = resUtils.getResource(romPath)
 
         if (res == null) {
             println("Rom not found")

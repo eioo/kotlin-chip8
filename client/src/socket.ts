@@ -1,12 +1,13 @@
-import { App, IState } from './app';
+import { App } from './app';
 import config from './config';
+import { IRomList, IState } from './types';
 
 const socketStatusEl = document.querySelector(
   '#socket-status'
 ) as HTMLSpanElement;
 
 export class Socket {
-  public ws: WebSocket | null;
+  public ws: WebSocket;
 
   constructor(private app: App) {
     this.createSocket();
@@ -19,10 +20,6 @@ export class Socket {
   }
 
   private setup() {
-    if (!this.ws) {
-      return;
-    }
-
     this.ws.onmessage = this.onMessage;
     this.ws.onopen = this.onOpen;
     this.ws.onclose = this.onClose;
@@ -32,23 +29,20 @@ export class Socket {
   private onMessage = (ev: Event) => {
     const { data } = ev;
 
-    if (data.length === 64 * 32) {
+    if (data.length === 64 * 32 && ['0', '1'].includes(data[0])) {
       return this.app.gfx.drawGraphics(data);
     }
 
-    // We got variables
-    const vars = data.split(';');
-    const state: IState = {
-      pc: parseInt(vars[0], 10),
-      i: parseInt(vars[1], 10),
-      sp: parseInt(vars[2], 10),
-      dt: parseInt(vars[3], 10),
-      st: parseInt(vars[4], 10),
-      stack: vars[5].split(',').map(x => parseInt(x, 10)),
-      v: vars[6].split(',').map(x => parseInt(x, 10)),
-    };
+    const json = JSON.parse(data);
+    const keys = Object.keys(json);
 
-    this.app.updateState(state);
+    if (keys.includes('pc')) {
+      this.app.ui.updateState(json as IState);
+    }
+
+    if (keys.includes('roms')) {
+      this.app.ui.updateRomList(json as IRomList);
+    }
   };
 
   private onOpen = () => {
@@ -57,8 +51,6 @@ export class Socket {
   };
 
   private onClose(ev: Event) {
-    this.ws = null;
-
     if (ev.code === 1006) {
       return;
     }
@@ -71,21 +63,6 @@ export class Socket {
   };
 
   private reconnect() {
-    socketStatusEl.textContent = 'Retrying';
-
-    let counter = 0;
-
-    const dotter = setInterval(() => {
-      socketStatusEl.textContent += '.';
-      counter++;
-
-      if (counter >= 3) {
-        clearInterval(dotter);
-      }
-    }, 1000);
-
-    setTimeout(() => {
-      this.createSocket();
-    }, 4e3);
+    this.createSocket();
   }
 }
