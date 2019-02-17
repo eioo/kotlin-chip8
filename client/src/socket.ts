@@ -36,7 +36,7 @@ export class Socket {
     const json = JSON.parse(data);
     const keys = Object.keys(json);
 
-    if (keys.includes('pc')) {
+    if (keys.includes('emustate')) {
       this.app.ui.updateState(json as IState);
     }
 

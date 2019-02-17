@@ -1,4 +1,5 @@
 export interface IState {
+  emustate: string;
   pc: number;
   i: number;
   sp: number;

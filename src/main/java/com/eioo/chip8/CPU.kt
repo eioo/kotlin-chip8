@@ -6,18 +6,18 @@ class CPU(private val emu: Emulator) {
     private var memory: Memory = emu.memory
     private var ins: Instructions = Instructions(this, memory)
 
-    val gfx: IntArray = IntArray(64 * 32)   // Graphics, 1 bit for each pixelMemory
-    val key: IntArray = IntArray(16)        // Pressed keys
-    val V: IntArray = IntArray(16)          // Registers (V0, V1, ... VE) VE: Carry flag
-    val stack: IntArray = IntArray(16)      // Stack
-    var opcode: Int = 0                     // Current operation code
-    var sp: Int = 0                         // Stack pointer
-    var I: Int = 0                          // Index register
-    var pc: Int = 0                         // Program counter (0x000 -> 0xFFF)
-    var delayTimer: Int = 0                 // Counts to zero
-    var soundTimer: Int = 0                 // Counts to zero
+    val gfx: IntArray = IntArray(64 * 32)    // Graphics, 1 bit for each pixelMemory
+    val key: IntArray = IntArray(16)         // Pressed keys
+    val V: IntArray = IntArray(16)           // Registers (V0, V1, ... VE) VE: Carry flag
+    val stack: IntArray = IntArray(16)       // Stack
+    var opcode: Int = 0                      // Current operation code
+    var sp: Int = 0                          // Stack pointer
+    var I: Int = 0                           // Index register
+    var pc: Int = 0                          // Program counter (0x000 -> 0xFFF)
+    var delayTimer: Int = 0                  // Counts to zero
+    var soundTimer: Int = 0                  // Counts to zero
 
-    private val frequency = 60              // CPU cycles per second (60 by default)
+    var frequency = 60                       // CPU cycles per second (60 by default)
     var drawFlag: Boolean = false
     var running: Boolean = false
 
@@ -41,11 +41,12 @@ class CPU(private val emu: Emulator) {
 
     fun mainLoop() {
         var deltaTime: Long
-        val sleepTime = 1000 / frequency
 
         while (running) {
+            val sleepTime = 1000 / frequency
             deltaTime = currentTimeMillis()
             performCycle()
+
             emu.broadcastVariables()
 
             if (drawFlag) {

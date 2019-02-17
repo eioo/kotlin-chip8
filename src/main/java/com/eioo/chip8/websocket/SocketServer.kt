@@ -21,6 +21,8 @@ class SocketServer(private val emu: Emulator, port: Int) : WebSocketServer(InetS
         val splitted = message!!.split(" ")
         val command = splitted[0]
 
+        println("Socket ~> $message")
+
         when (command) {
             "loadrom" -> {
                 val romName = splitted[1]
@@ -31,20 +33,16 @@ class SocketServer(private val emu: Emulator, port: Int) : WebSocketServer(InetS
                 emu.broadcastGraphics()
                 emu.loadRom(romPath)
             }
+            "changefreq" -> {
+                emu.cpu.frequency = Integer.valueOf(splitted[1])
+            }
             "start" -> {
-                println("Socket ~> Start")
                 emu.start()
             }
             "stop" -> {
-                println("Socket ~> Stop")
                 emu.stop()
             }
-            "step" -> {
-                // TODO: Implement
-                println("Socket ~> Step")
-            }
             "reset" -> {
-                println("Socket ~> Reset")
                 emu.stop()
                 emu.reset()
 

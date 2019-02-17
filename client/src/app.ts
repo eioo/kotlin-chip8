@@ -16,5 +16,6 @@ export class App {
 }
 
 (() => {
-  const _ = new App();
+  // tslint:disable-next-line:no-unused-expression
+  new App();
 })();

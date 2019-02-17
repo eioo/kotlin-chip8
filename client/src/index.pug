@@ -26,18 +26,24 @@ html(lang='en')
           div#socket-status -
 
           div Emulator status:&nbsp;
-          div#emulator-status -
+          div#emulator-status Waiting for ROM
 
-          div Select rom: 
+          div Select ROM: 
           div
             select#rom-list
               option(value="", disabled, selected)
         
         div.emulator-controls
-          button#start Start
-          button#stop Stop
-          button#step Step
-          button#reset Reset
+          button#start(disabled) Start
+          button#stop(disabled) Stop
+          button#reset(disabled) Reset
+
+        div.cpu-frequency
+          label CPU frequency (
+            span#cpu-frequency-label 60Hz
+            | )
+          input#cpu-frequency(type="range", min="10", max="500", value="60")
+
 
       fieldset.variables
         legend Variables

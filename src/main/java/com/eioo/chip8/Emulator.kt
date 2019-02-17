@@ -14,22 +14,14 @@ class Emulator {
     }
 
     fun broadcastGraphics() {
-        if (socketServer == null) {
-            println("No socket server")
-            return
-        }
-
         socketServer!!.broadcast(cpu.gfx.joinToString(""))
     }
 
     fun broadcastVariables() {
-        if (socketServer == null) {
-            println("No socket server")
-            return
-        }
-
+        val emuState = cpu.running.toString()
         val data = """
             {
+                "emustate": $emuState,
                 "pc": ${cpu.pc},
                 "i": ${cpu.I},
                 "sp": ${cpu.sp},
@@ -58,21 +50,22 @@ class Emulator {
     fun reset() {
         memory.reset()
         cpu.reset()
+        println("Emulator reset")
     }
 
     fun start() {
         cpu.running = true
 
-        val mainThread = Thread(Runnable {
+        Thread(Runnable {
             cpu.mainLoop()
-        })
+        }).start()
 
-        mainThread.start()
         println("Emulator started")
     }
 
     fun stop() {
         cpu.running = false
+        broadcastVariables()
         println("Emulator stopped")
     }
 }

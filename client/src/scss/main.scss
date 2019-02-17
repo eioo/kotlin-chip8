@@ -17,7 +17,7 @@ fieldset {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
-  grid-template-areas: 'display info' 'variables variables';
+  grid-template-areas: 'display info' 'variables .';
 }
 
 .variable {
@@ -66,6 +66,19 @@ fieldset {
     button {
       flex-grow: 1;
       padding: 5px;
+    }
+  }
+
+  .cpu-frequency {
+    margin-top: 10px;
+    label {
+      margin-top: 20px;
+    }
+
+    input[type='range'] {
+      width: 100%;
+      margin-top: 5px;
+      color: red;
     }
   }
 }

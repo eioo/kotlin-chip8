@@ -85,8 +85,6 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
     fun skipv(reg1: Int, reg2: Int) {
         // 5xy0 - SE Vx, Vy
         // Skip next instruction if Vx = Vy.
-        debugln(reg1)
-        debugln(reg2)
         cpu.pc += if (cpu.V[reg1] == cpu.V[reg2]) 4 else 2
 
         debugln("SE V${reg1.toHex()}, V${reg2.toHex()}")
