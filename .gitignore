@@ -45,4 +45,3 @@ build/
 .idea/artifacts/dist_auto_*
 kotlin-ultimate/
 target/
-src/client/.env

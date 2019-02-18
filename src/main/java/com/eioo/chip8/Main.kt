@@ -11,8 +11,6 @@ fun main(args: Array<String>) {
         debugMode = true
     }
 
-    println(dotenv["PORT"])
-
     val emu = Emulator()
     val server = SocketServer(emu, Integer.parseInt(dotenv["PORT"]))
     emu.socketServer = server

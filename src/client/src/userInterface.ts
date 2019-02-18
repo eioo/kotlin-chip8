@@ -2,6 +2,7 @@ import { App } from './app';
 import { IRomList, IState } from './types';
 
 const $ = document.querySelector.bind(document);
+const $all = document.querySelectorAll.bind(document);
 
 export class UserInterface {
   private pcEl = $('#pc') as HTMLInputElement;
@@ -10,6 +11,7 @@ export class UserInterface {
   private dtEl = $('#dt') as HTMLInputElement;
   private stEl = $('#st') as HTMLInputElement;
 
+  private socketStatusEl = $('#socket-status') as HTMLSpanElement;
   private emuStatusEl = $('#emulator-status') as HTMLDivElement;
   private romListEl = $('#rom-list') as HTMLSelectElement;
   private startBtn = $('#start') as HTMLButtonElement;
@@ -17,9 +19,52 @@ export class UserInterface {
   private resetBtn = $('#reset') as HTMLButtonElement;
   private cpuFreqSlider = $('#cpu-frequency') as HTMLInputElement;
   private cpuFreqLabel = $('#cpu-frequency-label') as HTMLSpanElement;
+  private varElements = Array.from(
+    $all('.variables input[type="text"]')
+  ) as HTMLInputElement[];
+
+  private defaultCpuFreq = 60;
 
   constructor(private app: App) {
     this.eventHandlers();
+  }
+
+  public reset() {
+    this.romListEl.setAttribute('disabled', '');
+    this.romListEl.value = '';
+    this.startBtn.setAttribute('disabled', '');
+    this.stopBtn.setAttribute('disabled', '');
+    this.resetBtn.setAttribute('disabled', '');
+    this.cpuFreqSlider.setAttribute('disabled', '');
+    this.cpuFreqSlider.value = this.defaultCpuFreq.toString();
+    this.cpuFreqLabel.textContent = `${this.defaultCpuFreq}Hz`;
+    this.varElements.forEach(el => {
+      el.value = '0';
+    });
+
+    this.app.gfx.clearGraphics();
+  }
+
+  public setSocketStatus(text: string) {
+    this.socketStatusEl.textContent = text;
+  }
+
+  public setEmulatorStatus(text: string) {
+    this.emuStatusEl.textContent = text;
+  }
+
+  public disableRomSelect() {}
+
+  public enableRomSelect() {
+    this.emuStatusEl.textContent = 'Please select rom';
+    this.romListEl.removeAttribute('disabled');
+  }
+
+  public enableEmulatorControls() {
+    this.startBtn.removeAttribute('disabled');
+    this.stopBtn.removeAttribute('disabled');
+    this.resetBtn.removeAttribute('disabled');
+    this.cpuFreqSlider.removeAttribute('disabled');
   }
 
   public updateRomList({ roms }: IRomList) {
@@ -56,28 +101,24 @@ export class UserInterface {
   }
 
   private eventHandlers() {
-    const { ws } = this.app.socket;
-
     this.romListEl.onchange = () => {
       const selectedItem = this.romListEl.options[this.romListEl.selectedIndex]
         .value;
 
-      ws.send(`loadrom ${selectedItem}`);
-      this.startBtn.removeAttribute('disabled');
-      this.stopBtn.removeAttribute('disabled');
-      this.resetBtn.removeAttribute('disabled');
+      this.app.socket.ws.send(`loadrom ${selectedItem}`);
+      this.enableEmulatorControls();
     };
 
     this.startBtn.onclick = () => {
-      ws.send('start');
+      this.app.socket.ws.send('start');
     };
 
     this.stopBtn.onclick = () => {
-      ws.send('stop');
+      this.app.socket.ws.send('stop');
     };
 
     this.resetBtn.onclick = () => {
-      ws.send('reset');
+      this.app.socket.ws.send('reset');
     };
 
     this.cpuFreqSlider.oninput = () => {
@@ -85,7 +126,7 @@ export class UserInterface {
     };
 
     this.cpuFreqSlider.onchange = () => {
-      ws.send(`changefreq ${this.cpuFreqSlider.value}`);
+      this.app.socket.ws.send(`changefreq ${this.cpuFreqSlider.value}`);
     };
   }
 }

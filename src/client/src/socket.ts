@@ -2,28 +2,25 @@ import { App } from './app';
 import config from './config';
 import { IRomList, IState } from './types';
 
-const socketStatusEl = document.querySelector(
-  '#socket-status'
-) as HTMLSpanElement;
-
 export class Socket {
   public ws: WebSocket;
+  private connectingText = 'Waiting for server';
+  private connectedText = 'Connected';
 
   constructor(private app: App) {
+    this.app.ui.setSocketStatus(this.connectingText);
     this.createSocket();
   }
 
-  private createSocket() {
-    socketStatusEl.textContent = 'Connecting';
+  private createSocket = () => {
     this.ws = new WebSocket(`ws://${config.host}:${config.port}`);
     this.setup();
-  }
+  };
 
   private setup() {
     this.ws.onmessage = this.onMessage;
     this.ws.onopen = this.onOpen;
     this.ws.onclose = this.onClose;
-    this.ws.onerror = this.onError;
   }
 
   private onMessage = (ev: Event) => {
@@ -37,7 +34,7 @@ export class Socket {
     const keys = Object.keys(json);
 
     if (keys.includes('emustate')) {
-      this.app.ui.updateState(json as IState);
+      return this.app.ui.updateState(json as IState);
     }
 
     if (keys.includes('roms')) {
@@ -46,23 +43,20 @@ export class Socket {
   };
 
   private onOpen = () => {
-    socketStatusEl.textContent = 'Connected';
+    this.app.ui.setSocketStatus(this.connectedText);
+    this.app.ui.setEmulatorStatus('Please select rom');
+    this.app.ui.enableRomSelect();
+
     console.log('Connected to server');
   };
 
-  private onClose(ev: Event) {
-    if (ev.code === 1006) {
-      return;
-    }
+  private onClose = () => {
+    this.app.ui.reset();
+    this.app.ui.setSocketStatus(this.connectingText);
+    this.app.ui.setEmulatorStatus('-');
 
-    console.log('Closed connection to server');
-  }
-
-  private onError = () => {
-    this.reconnect();
+    setTimeout(() => {
+      this.createSocket();
+    }, 500);
   };
-
-  private reconnect() {
-    this.createSocket();
-  }
 }

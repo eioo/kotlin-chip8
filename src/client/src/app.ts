@@ -1,6 +1,5 @@
 import { Graphics } from './graphics';
 import { Socket } from './socket';
-import { IRomList, IState } from './types';
 import { UserInterface } from './userInterface';
 
 export class App {
@@ -9,9 +8,9 @@ export class App {
   public ui: UserInterface;
 
   constructor() {
+    this.ui = new UserInterface(this);
     this.socket = new Socket(this);
     this.gfx = new Graphics();
-    this.ui = new UserInterface(this);
   }
 }
 

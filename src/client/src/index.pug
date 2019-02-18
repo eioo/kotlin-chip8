@@ -19,18 +19,18 @@ html(lang='en')
         canvas
       
       fieldset.info
-        legend Information
+        legend Emulator
         
         .grid
           div Socket status:&nbsp;
           div#socket-status -
 
           div Emulator status:&nbsp;
-          div#emulator-status Waiting for ROM
+          div#emulator-status -
 
           div Select ROM: 
           div
-            select#rom-list
+            select#rom-list(disabled)
               option(value="", disabled, selected)
         
         div.emulator-controls
@@ -42,7 +42,7 @@ html(lang='en')
           label CPU frequency (
             span#cpu-frequency-label 60Hz
             | )
-          input#cpu-frequency(type="range", min="10", max="500", value="60")
+          input#cpu-frequency(type="range", min="10", max="500", value="60", disabled)
 
 
       fieldset.variables

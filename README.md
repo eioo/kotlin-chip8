@@ -31,10 +31,10 @@ npm start
 
 ## TODO
 
-- Some instructions are still missing (Pong runs fine though!)
-- Handling of keypresses
-- Sounds
-- Heartbeat for socket. Sometimes you need to refresh the page so that the socket connects properly
+- [ ] Some instructions are still missing (Pong runs fine though!)
+- [ ] Handling of keypresses
+- [ ] Sounds
+- [x] Heartbeat for socket. Sometimes you need to refresh the page so that the socket connects properly
 
 ## License
 
