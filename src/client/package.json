@@ -7,15 +7,15 @@
     "build": "parcel build src/index.pug",
     "start": "parcel src/index.pug"
   },
-  "devDependencies": {
+  "dependencies": {
+    "@types/dotenv": "^6.1.0",
     "@types/ws": "^6.0.1",
+    "dotenv": "^6.2.0",
+    "parcel-bundler": "^1.11.0",
     "pug": "^2.0.3",
     "sass": "^1.17.0",
     "tslint-config-prettier": "^1.17.0",
-    "typescript": "^3.2.2"
-  },
-  "dependencies": {
-    "parcel-bundler": "^1.11.0",
+    "typescript": "^3.2.2",
     "ws": "^6.1.3"
   }
 }

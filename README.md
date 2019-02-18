@@ -8,14 +8,19 @@ There's no real benefit in using WebSockets and browser for graphics and control
 
 ![example](https://raw.githubusercontent.com/eioo/kotlin-chip8/master/github/example.gif)
 
+## Requirements
+
+- Node.js
+- JDK 11
+
 ## Installation
 
-1. Make copy of `client/.env.example` to `client/.env` and fill with your details. You also need to change port in `com.eioo.chip8.Main.main` if you change it in `.env` (Default is 8080).
+1. Make copy of `.env.example` to `.env` and fill with your details.
 
 2. Run these commands to install and run client
 
 ```
-cd client
+cd src/client
 npm install
 npm start
 ```
