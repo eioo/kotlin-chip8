@@ -6,7 +6,7 @@ There's no real benefit in using WebSockets and browser for graphics and control
 
 ## Example of operation
 
-![example](https://raw.githubusercontent.com/eioo/kotlin-chip8/master/github/example.gif)
+![example](https://i.imgur.com/MNbwb7s.gif)
 
 ## Requirements
 
