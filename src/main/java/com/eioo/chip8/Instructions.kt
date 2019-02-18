@@ -242,8 +242,8 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         // Dxyn - DRW Vx, Vy, nibble
         // Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision.
 
-        val x = cpu.V[reg1].and(0xff)
-        val y = cpu.V[reg2].and(0xff)
+        val locX = cpu.V[reg1].and(0xff)
+        val locY = cpu.V[reg2].and(0xff)
         cpu.V[0xF] = 0
 
         for (yy in 0 until height) {
@@ -251,7 +251,9 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
 
             for (xx in 0 until 8) {
                 if ((pixel and (0x80 shr xx)) != 0) {
-                    val index = (x + xx + ((y + yy) * 64))
+                    val index = (locX + xx + ((locY + yy) * 64))
+
+                    if (index >= 64 * 32) continue
 
                     if (cpu.gfx[index] == 1) {
                         cpu.V[0xF] = 1
@@ -265,7 +267,7 @@ open class Instructions(private var cpu: CPU, private var memory: Memory) {
         cpu.drawFlag = true
         cpu.pc += 2
 
-        debugln("DRW V${reg1.toHex()}, V${reg2.toHex()}, $height (x: $x, y: $y)")
+        debugln("DRW V${reg1.toHex()}, V${reg2.toHex()}, $height (x: $locX, y: $locY)")
     }
     // endregion
 

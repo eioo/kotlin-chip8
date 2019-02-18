@@ -1,4 +1,5 @@
 import { App } from './app';
+import beepAudio from './assets/beep.mp3';
 import { IRomList, IState } from './types';
 
 const $ = document.querySelector.bind(document);
@@ -24,6 +25,7 @@ export class UserInterface {
   ) as HTMLInputElement[];
 
   private defaultCpuFreq = 60;
+  private canPlaySound = true;
 
   constructor(private app: App) {
     this.eventHandlers();
@@ -52,8 +54,6 @@ export class UserInterface {
   public setEmulatorStatus(text: string) {
     this.emuStatusEl.textContent = text;
   }
-
-  public disableRomSelect() {}
 
   public enableRomSelect() {
     this.emuStatusEl.textContent = 'Please select rom';
@@ -93,11 +93,21 @@ export class UserInterface {
     this.spEl.value = sp.toString(16);
     this.dtEl.value = dt.toString(16);
     this.stEl.value = st.toString(16);
-    this.updateEmulatorStatus(emustate ? 'Running' : 'Stopped');
+
+    // TODO: Add real duration here
+    if (st > 0 && this.canPlaySound) {
+      this.canPlaySound = false;
+      this.playSound();
+    } else if (st === 0) {
+      this.canPlaySound = true;
+    }
+
+    this.setEmulatorStatus(emustate ? 'Running' : 'Stopped');
   }
 
-  public updateEmulatorStatus(newStatus: string) {
-    this.emuStatusEl.textContent = newStatus;
+  private playSound() {
+    const audio = new Audio(beepAudio);
+    audio.play();
   }
 
   private eventHandlers() {

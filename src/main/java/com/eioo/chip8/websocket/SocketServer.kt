@@ -14,18 +14,20 @@ class SocketServer(private val emu: Emulator, port: Int) : WebSocketServer(InetS
     }
 
     override fun onClose(conn: WebSocket?, code: Int, reason: String?, remote: Boolean) {
+        emu.stop()
         println("Socket disconnected")
     }
 
     override fun onMessage(conn: WebSocket?, message: String?) {
         val splitted = message!!.split(" ")
         val command = splitted[0]
+        val params = splitted.subList(1, splitted.size)
 
         println("Socket ~> $message")
 
         when (command) {
             "loadrom" -> {
-                val romName = splitted[1]
+                val romName = params[0]
                 val romPath = "roms/$romName"
                 emu.stop()
                 emu.reset()
@@ -53,7 +55,15 @@ class SocketServer(private val emu: Emulator, port: Int) : WebSocketServer(InetS
                 emu.broadcastVariables()
                 emu.broadcastGraphics()
             }
-            else -> println("$conn: $message")
+            "keydown" -> {
+                val index = Integer.parseInt(params[0])
+                emu.cpu.key[index] = 1
+            }
+            "keyup" -> {
+                val index = Integer.parseInt(params[0])
+                emu.cpu.key[index] = 0
+            }
+            else -> println("Socket <~> Unknown command")
         }
     }
 
